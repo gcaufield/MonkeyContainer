@@ -1,5 +1,21 @@
 FROM ubuntu:bionic
 
+ARG vcs_rev="dev"
+ARG created="2020-10-01"
+ARG sdk_ver="connectiq-sdk-lin-3.2.2-2020-08-28-a50584d55"
+ARG version="v0.0.0"
+
+LABEL org.opencontainers.image.created="$created"
+LABEL org.opencontainers.image.authors="Greg Caufield <greg@embeddedcoffee.ca>"
+LABEL org.opencontainers.image.url="https://github.com/gcaufield/MonkeyContainer"
+LABEL org.opencontainers.image.documentation="https://github.com/gcaufield/MonkeyContainer/wiki"
+LABEL org.opencontainers.image.source="https://github.com/gcaufield/MonkeyContainer"
+LABEL org.opencontainers.image.version="$version"
+LABEL org.opencontainers.image.revision="$vcs_rev"
+#LABEL org.opencontainers.image
+
+LABEL ca.embeddedcoffee.containers.monkey.ciqsdk.ver="$sdk_ver"
+
 RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get install -y openjdk-11-jdk git
@@ -8,10 +24,12 @@ RUN apt-get install -y wget
 RUN apt-get install -y unzip
 RUN apt-get install -y libpng16-16 libwebkitgtk-1.0-0 zlib1g-dev libc6-dev libstdc++6 libusb-dev
 RUN DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y xorg xserver-xorg-video-dummy x11-apps
+    apt-get install -y xorg xserver-xorg-video-dummy
 
 COPY dummy-1920x1080.conf /etc/X11/xorg.conf
+COPY scripts/start_display.sh /usr/bin/start_display
 RUN sed -i "s/allowed_users=console/allowed_users=anybody/" /etc/X11/Xwrapper.config
+ENV DISPLAY=:1
 
 RUN pip3 install gdown mbpkg
 
@@ -20,30 +38,22 @@ WORKDIR /home/connectiq
 USER connectiq
 
 #ENV HOME="/home/connectiq/"
-ENV SDK_BASE_URL="https://developer.garmin.com/downloads/connect-iq/sdks"
-ENV SDK="connectiq-sdk-lin-3.2.2-2020-08-28-a50584d55.zip"
-ENV SDK_URL="$SDK_BASE_URL/$SDK"
-ENV SDK_FILE="sdk.zip"
-ENV SDK_DIR="/home/connectiq/.Garmin/ConnectIQ/Sdks/current"
-ENV DEVICE_FILE="devices.zip"
-ENV DEVICE_DIR="/home/connectiq/.Garmin/ConnectIQ/"
+ARG sdk_base_url="https://developer.garmin.com/downloads/connect-iq/sdks"
+ARG sdk_url="$sdk_base_url/$sdk_ver.zip"
+ARG sdk_file="sdk.zip"
+ARG sdk_dir="/home/connectiq/.Garmin/ConnectIQ/Sdks/${sdk_ver}"
+ARG device_file="devices.zip"
+ARG device_dir="/home/connectiq/.Garmin/ConnectIQ/"
 
-ENV PEM_FILE="/tmp/developer_key.pem"
-ENV DER_FILE="/tmp/developer_key.der"
+ENV MB_HOME="${sdk_dir}"
 
-ENV MB_HOME="${SDK_DIR}"
-ENV MB_PRIVATE_KEY="${DER_FILE}"
+RUN wget -O "${sdk_file}" "${sdk_url}"
+RUN mkdir -p "${sdk_dir}"
+RUN unzip "${sdk_file}" "*" -d "${sdk_dir}"
 
-RUN wget -O "${SDK_FILE}" "${SDK_URL}"
-RUN mkdir -p "${SDK_DIR}"
-RUN unzip "${SDK_FILE}" "*" -d "${SDK_DIR}"
-# RUN unzip "${SDK_FILE}" "share/*" -d "${SDK_DIR}"
+RUN gdown --id "1nDYmQqfE73wiSQJby5ZW4fkIfYc1ka6V" -O "${device_file}"
+RUN mkdir -p "${device_dir}"
+RUN unzip "${device_file}" "Devices/*" -d "${device_dir}"
 
-RUN gdown --id "1nDYmQqfE73wiSQJby5ZW4fkIfYc1ka6V" -O "${DEVICE_FILE}"
-RUN mkdir -p "${DEVICE_DIR}"
-RUN unzip "${DEVICE_FILE}" "Devices/*" -d "${DEVICE_DIR}"
-
-RUN openssl genrsa -out "${PEM_FILE}" 4096
-RUN openssl pkcs8 -topk8 -inform PEM -outform DER -in "${PEM_FILE}" -out "${DER_FILE}" -nocrypt
-
-
+CMD ["/usr/bin/start_display"]
+CMD ["/bin/bash"]
