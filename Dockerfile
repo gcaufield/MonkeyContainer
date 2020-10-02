@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.authors="Greg Caufield <greg@embeddedcoffee.ca>"
 LABEL org.opencontainers.image.url="https://github.com/gcaufield/MonkeyContainer"
 LABEL org.opencontainers.image.documentation="https://github.com/gcaufield/MonkeyContainer/wiki"
 LABEL org.opencontainers.image.source="https://github.com/gcaufield/MonkeyContainer"
-LABEL org.opencontainers.image.version="v0.0.0"
+LABEL org.opencontainers.image.version="vorg.opencontainers.image.version="0.1.0""
 LABEL org.opencontainers.image.revision="$vcs_rev"
 
 LABEL ca.embeddedcoffee.containers.monkey.ciqsdk.ver="$sdk_ver"
