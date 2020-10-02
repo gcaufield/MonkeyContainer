@@ -3,16 +3,14 @@ FROM ubuntu:bionic
 ARG vcs_rev="dev"
 ARG created="2020-10-01"
 ARG sdk_ver="connectiq-sdk-lin-3.2.2-2020-08-28-a50584d55"
-ARG version="v0.0.0"
 
 LABEL org.opencontainers.image.created="$created"
 LABEL org.opencontainers.image.authors="Greg Caufield <greg@embeddedcoffee.ca>"
 LABEL org.opencontainers.image.url="https://github.com/gcaufield/MonkeyContainer"
 LABEL org.opencontainers.image.documentation="https://github.com/gcaufield/MonkeyContainer/wiki"
 LABEL org.opencontainers.image.source="https://github.com/gcaufield/MonkeyContainer"
-LABEL org.opencontainers.image.version="$version"
+LABEL org.opencontainers.image.version="v0.0.0"
 LABEL org.opencontainers.image.revision="$vcs_rev"
-#LABEL org.opencontainers.image
 
 LABEL ca.embeddedcoffee.containers.monkey.ciqsdk.ver="$sdk_ver"
 
@@ -28,6 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 COPY dummy-1920x1080.conf /etc/X11/xorg.conf
 COPY scripts/start_display.sh /usr/bin/start_display
+
 RUN sed -i "s/allowed_users=console/allowed_users=anybody/" /etc/X11/Xwrapper.config
 ENV DISPLAY=:1
 
@@ -55,5 +54,3 @@ RUN gdown --id "1nDYmQqfE73wiSQJby5ZW4fkIfYc1ka6V" -O "${device_file}"
 RUN mkdir -p "${device_dir}"
 RUN unzip "${device_file}" "Devices/*" -d "${device_dir}"
 
-CMD ["/usr/bin/start_display"]
-CMD ["/bin/bash"]
