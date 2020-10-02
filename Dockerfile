@@ -1,15 +1,16 @@
 FROM ubuntu:bionic
 
 ARG vcs_rev="dev"
-ARG created="2020-10-01"
+ARG created=""
 ARG sdk_ver="connectiq-sdk-lin-3.2.2-2020-08-28-a50584d55"
+ARG version="development"
 
 LABEL org.opencontainers.image.created="$created"
 LABEL org.opencontainers.image.authors="Greg Caufield <greg@embeddedcoffee.ca>"
 LABEL org.opencontainers.image.url="https://github.com/gcaufield/MonkeyContainer"
 LABEL org.opencontainers.image.documentation="https://github.com/gcaufield/MonkeyContainer/wiki"
 LABEL org.opencontainers.image.source="https://github.com/gcaufield/MonkeyContainer"
-LABEL org.opencontainers.image.version="vorg.opencontainers.image.version="0.1.0""
+LABEL org.opencontainers.image.version="$version"
 LABEL org.opencontainers.image.revision="$vcs_rev"
 
 LABEL ca.embeddedcoffee.containers.monkey.ciqsdk.ver="$sdk_ver"
